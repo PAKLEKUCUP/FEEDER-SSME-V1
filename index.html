@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101318">
+<title>FEEDER SSME V.1</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#101318;color:#e9edf2;font-family:Arial,sans-serif}
+body{padding:10px;max-width:720px;margin:auto}
+h1{font-size:21px;margin:2px 0}.sub{color:#8f9aa8;font-size:12px;margin-bottom:10px}
+.panel{background:#181d24;border:1px solid #2b323c;border-radius:12px;padding:11px;margin-bottom:10px}
+.title{font-size:13px;font-weight:bold;color:#aeb8c5;margin-bottom:8px}
+.row{display:flex;gap:8px;align-items:center}.grow{flex:1}
+button,select{background:#252c35;color:#e9edf2;border:1px solid #3b4551;border-radius:8px;padding:9px 10px;font-size:12px}
+button.on{background:#315d42;border-color:#4c9b69}
+button:active{transform:scale(.98)}
+input[type=range]{width:100%;accent-color:#aeb8c5}
+label{font-size:11px;color:#9ca7b5;display:block;margin-bottom:4px}
+.value{text-align:center;font-size:11px;color:#cbd2da;margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.knob{background:#12161b;border:1px solid #303843;border-radius:9px;padding:8px}
+.meter{height:18px;background:#0b0e11;border-radius:5px;overflow:hidden;position:relative;border:1px solid #303640}
+.bar{height:100%;width:0;background:#45a866;transition:width .04s linear}
+.bar.warn{background:#d4a62a}.bar.clip{background:#d84a4a}
+.db{text-align:right;font-size:11px;margin-top:3px;color:#aeb8c5}
+.status{font-size:11px;color:#7fd08f;margin-top:5px}
+.small{font-size:10px;color:#7e8996;line-height:1.35}
+.file{width:100%;font-size:12px}
+hr{border:0;border-top:1px solid #2a3038;margin:10px 0}
+</style>
+</head>
+<body>
+<h1>FEEDER – Simple Sound Mixing Engineer V.1</h1>
+<div class="sub">FEEDER SSME V.1 · lightweight browser audio mixer</div>
+
+<div class="panel">
+ <div class="title">INPUT</div>
+ <input class="file" id="file" type="file" accept="audio/*">
+ <div class="row" style="margin-top:8px">
+   <button id="start">▶ START</button><button id="stop">■ STOP</button>
+   <button id="play">PLAY</button><button id="pause">PAUSE</button>
+ </div>
+ <div class="small" id="filename">Belum ada file audio.</div>
+</div>
+
+<div class="panel">
+ <div class="title">INPUT LEVEL / CLIPPING WARNING</div>
+ <label>LEFT</label><div class="meter"><div id="ml" class="bar"></div></div><div id="dbl" class="db">-∞ dB</div>
+ <label style="margin-top:7px">RIGHT</label><div class="meter"><div id="mr" class="bar"></div></div><div id="dbr" class="db">-∞ dB</div>
+ <div id="warn" class="status">READY</div>
+</div>
+
+<div class="panel">
+ <div class="title">PRE-AMP / AUTO GAIN</div>
+ <div class="grid2">
+  <div class="knob"><label>PRE-AMP</label><input id="gain" type="range" min="-24" max="18" step=".1" value="0"><div class="value" id="gainv">0.0 dB</div></div>
+  <div class="knob"><label>AUTO GAIN</label><button id="autogain" style="width:100%">OFF</button><div class="value">target -12 dB</div></div>
+ </div>
+</div>
+
+<div class="panel">
+ <div class="title">STEREO CONTROL</div>
+ <label>PAN L ↔ R</label><input id="pan" type="range" min="-1" max="1" step=".01" value="0"><div class="value" id="panv">CENTER</div>
+ <hr>
+ <div class="grid2">
+  <div class="knob"><label>LEFT LEVEL</label><input id="left" type="range" min="0" max="1.5" step=".01" value="1"><div class="value" id="leftv">100%</div></div>
+  <div class="knob"><label>RIGHT LEVEL</label><input id="right" type="range" min="0" max="1.5" step=".01" value="1"><div class="value" id="rightv">100%</div></div>
+ </div>
+ <button id="link" style="width:100%;margin-top:8px">🔗 LINK L/R: ON</button>
+</div>
+
+<div class="panel">
+ <div class="title">FADER</div>
+ <input id="fader" type="range" min="0" max="1.2" step=".01" value=".8">
+ <div class="value" id="faderv">80%</div>
+</div>
+
+<div class="panel">
+ <div class="title">DIRECT SOUND SETTING</div>
+ <div class="grid3">
+  <div class="knob"><label>REVERB</label><button id="reverb" style="width:100%">OFF</button><input id="reverbAmt" type="range" min="0" max="1" step=".01" value=".18"><div class="value" id="reverbv">18%</div></div>
+  <div class="knob"><label>EQ</label><select id="eqmode" style="width:100%"><option value="0">FLAT</option><option value="1">WARM</option><option value="2">BRIGHT</option><option value="3">VOICE</option></select><div class="value">3-band</div></div>
+  <div class="knob"><label>DELAY</label><button id="delay" style="width:100%">OFF</button><input id="delayAmt" type="range" min="0" max="1" step=".01" value=".12"><div class="value" id="delayv">12%</div></div>
+ </div>
+</div>
+
+<div class="panel">
+ <div class="title">FILTER / MONITOR / AUTO</div>
+ <div class="grid2">
+  <div class="knob"><label>IIR FILTER</label><select id="iir" style="width:100%"><option value="off">OFF</option><option value="hp">HIGH-PASS</option><option value="lp">LOW-PASS</option><option value="band">BAND-PASS</option></select></div>
+  <div class="knob"><label>IFR</label><button id="ifr" style="width:100%">OFF</button><div class="small">light presence filter</div></div>
+ </div>
+ <div class="grid3" style="margin-top:9px">
+  <button id="afl">AFL OFF</button><button id="autocut">AUTO CUT OFF</button><button id="noise">NOISE REDUCTION OFF</button>
+ </div>
+</div>
+
+<div class="panel">
+ <div class="title">OUTPUT</div>
+ <div class="meter"><div id="mo" class="bar"></div></div><div id="dbo" class="db">-∞ dB</div>
+ <div class="small">Gunakan headphone/speaker dengan volume rendah saat pengujian pertama.</div>
+</div>
+
+<script>
+let ctx, src, nodes={}, audio, raf;
+const $=id=>document.getElementById(id);
+function db(v){return v<=0.00001?-60:20*Math.log10(v)}
+function fmtDb(v){return v<=-59?"-∞ dB":v.toFixed(1)+" dB"}
+function button(id,onText,offText,fn){
+ $(id).onclick=()=>{nodes[id]=!nodes[id];$(id).textContent=nodes[id]?onText:offText;$(id).classList.toggle("on",nodes[id]);fn&&fn(nodes[id])}
+}
+function setv(id,text){$(id).textContent=text}
+function createAudio(){
+ if(ctx)return;
+ ctx=new (window.AudioContext||window.webkitAudioContext)();
+ nodes.input=ctx.createGain();
+ nodes.pre=ctx.createGain();
+ nodes.pan=ctx.createStereoPanner();
+ nodes.left=ctx.createGain(); nodes.right=ctx.createGain();
+ nodes.split=ctx.createChannelSplitter(2);
+ nodes.lg=ctx.createGain(); nodes.rg=ctx.createGain();
+ nodes.merge=ctx.createChannelMerger(2);
+ nodes.fader=ctx.createGain();
+ nodes.low=ctx.createBiquadFilter(); nodes.mid=ctx.createBiquadFilter(); nodes.high=ctx.createBiquadFilter();
+ nodes.iir=ctx.createBiquadFilter(); nodes.ifr=ctx.createBiquadFilter();
+ nodes.delay=ctx.createDelay(2); nodes.delayGain=ctx.createGain();
+ nodes.reverbDelay=ctx.createDelay(0.8); nodes.reverbGain=ctx.createGain();
+ nodes.master=ctx.createGain(); nodes.analyser=ctx.createAnalyser();
+ nodes.analyser.fftSize=512;
+ nodes.input.connect(nodes.pre).connect(nodes.pan).connect(nodes.split);
+ nodes.split.connect(nodes.lg,0); nodes.split.connect(nodes.rg,1);
+ nodes.lg.connect(nodes.merge,0,0); nodes.rg.connect(nodes.merge,0,1);
+ nodes.merge.connect(nodes.fader);
+ nodes.fader.connect(nodes.low).connect(nodes.mid).connect(nodes.high).connect(nodes.iir).connect(nodes.ifr).connect(nodes.master);
+ nodes.fader.connect(nodes.delay).connect(nodes.delayGain).connect(nodes.master);
+ nodes.fader.connect(nodes.reverbDelay).connect(nodes.reverbGain).connect(nodes.master);
+ nodes.master.connect(nodes.analyser).connect(ctx.destination);
+ [nodes.low,nodes.mid,nodes.high].forEach(n=>n.type="peaking");
+ nodes.low.frequency.value=120;nodes.low.Q.value=.8;nodes.low.gain.value=0;
+ nodes.mid.frequency.value=1000;nodes.mid.Q.value=.9;nodes.mid.gain.value=0;
+ nodes.high.frequency.value=5000;nodes.high.Q.value=.8;nodes.high.gain.value=0;
+ nodes.iir.type="allpass"; nodes.ifr.type="allpass";
+ nodes.delay.delayTime.value=.18;nodes.delayGain.gain.value=0;
+ nodes.reverbDelay.delayTime.value=.32;nodes.reverbGain.gain.value=0;
+ nodes.master.gain.value=.8;
+}
+function connectFile(){
+ createAudio(); if(src)src.disconnect();
+ src=ctx.createMediaElementSource(audio);src.connect(nodes.input); audio.onended=()=>{};
+}
+$("file").onchange=e=>{
+ const f=e.target.files[0]; if(!f)return;
+ if(audio){audio.pause();URL.revokeObjectURL(audio.src)}
+ audio=new Audio(URL.createObjectURL(f));audio.preload="auto";connectFile();
+ $("filename").textContent=f.name;
+};
+$("start").onclick=async()=>{createAudio();await ctx.resume();if(!audio){$("warn").textContent="Pilih file audio terlebih dahulu.";return}audio.play();};
+$("stop").onclick=()=>{if(audio){audio.pause();audio.currentTime=0}};
+$("play").onclick=async()=>{if(audio){await ctx.resume();audio.play()}};
+$("pause").onclick=()=>{if(audio)audio.pause()};
+
+$("gain").oninput=e=>{let v=+e.target.value;nodes.pre&&(nodes.pre.gain.value=10**(v/20));setv("gainv",v.toFixed(1)+" dB")};
+$("fader").oninput=e=>{let v=+e.target.value;nodes.fader&&(nodes.fader.gain.value=v);setv("faderv",Math.round(v*100)+"%")};
+$("pan").oninput=e=>{let v=+e.target.value;nodes.pan&&(nodes.pan.pan.value=v);setv("panv",v<-.02?"L "+Math.round(-v*100)+"%":v>.02?"R "+Math.round(v*100)+"%":"CENTER")};
+$("left").oninput=e=>{let v=+e.target.value;nodes.lg&&(nodes.lg.gain.value=v);setv("leftv",Math.round(v*100)+"%");if(nodes.link){$("right").value=v;nodes.rg.gain.value=v;setv("rightv",Math.round(v*100)+"%")}};
+$("right").oninput=e=>{let v=+e.target.value;nodes.rg&&(nodes.rg.gain.value=v);setv("rightv",Math.round(v*100)+"%");if(nodes.link){$("left").value=v;nodes.lg.gain.value=v;setv("leftv",Math.round(v*100)+"%")}};
+
+nodes.link=true;
+$("link").onclick=()=>{nodes.link=!nodes.link;$("link").textContent="🔗 LINK L/R: "+(nodes.link?"ON":"OFF");$("link").classList.toggle("on",nodes.link)};
+
+button("autogain","ON","OFF",on=>{if(on){let v=nodes.pre.gain.value;nodes.pre.gain.value=Math.min(v,1);$("gain").value=20*Math.log10(nodes.pre.gain.value);setv("gainv",(20*Math.log10(nodes.pre.gain.value)).toFixed(1)+" dB")}});
+button("reverb","ON","OFF",on=>nodes.reverbGain.gain.value=on?(+$("reverbAmt").value):0);
+button("delay","ON","OFF",on=>nodes.delayGain.gain.value=on?(+$("delayAmt").value):0);
+button("ifr","ON","OFF",on=>{nodes.ifr.type=on?"highshelf":"allpass";nodes.ifr.frequency.value=3500;nodes.ifr.gain.value=on?1.5:0});
+button("afl","AFL ON","AFL OFF",on=>{nodes.afl=on});
+button("autocut","AUTO CUT ON","AUTO CUT OFF",on=>{nodes.autocut=on});
+button("noise","NOISE REDUCTION ON","NOISE REDUCTION OFF",on=>{nodes.noise=on});
+
+$("reverbAmt").oninput=e=>{setv("reverbv",Math.round(e.target.value*100)+"%");if(nodes.reverbGain&&nodes.reverb){nodes.reverbGain.gain.value=+e.target.value}};
+$("delayAmt").oninput=e=>{setv("delayv",Math.round(e.target.value*100)+"%");if(nodes.delayGain&&nodes.delay){nodes.delayGain.gain.value=+e.target.value}};
+$("eqmode").onchange=e=>{
+ if(!nodes.low)return; let p=[[0,0,0], [2,-1,-1],[-1,0,3],[1,2,1]][+e.target.value];
+ nodes.low.gain.value=p[0];nodes.mid.gain.value=p[1];nodes.high.gain.value=p[2];
+};
+$("iir").onchange=e=>{
+ if(!nodes.iir)return;let v=e.target.value;
+ nodes.iir.type=v==="off"?"allpass":v==="hp"?"highpass":v==="lp"?"lowpass":"bandpass";
+ nodes.iir.frequency.value=v==="hp"?70:v==="lp"?12000:1200;
+ nodes.iir.Q.value=0.7;
+};
+
+function meter(){
+ if(!nodes.analyser){raf=requestAnimationFrame(meter);return}
+ const a=new Uint8Array(nodes.analyser.fftSize);nodes.analyser.getByteTimeDomainData(a);
+ let sum=0;for(let i=0;i<a.length;i++){let x=(a[i]-128)/128;sum+=x*x}
+ let rms=Math.sqrt(sum/a.length), d=20*Math.log10(Math.max(rms,1e-6));
+ let pct=Math.max(0,Math.min(100,(d+60)/60*100));
+ ["ml","mr","mo"].forEach(id=>{$(id).style.width=pct+"%";$(id).className="bar"+(d>-6?(d>=-1?" clip":" warn"):"")});
+ $("dbl").textContent=fmtDb(d);$("dbr").textContent=fmtDb(d);$("dbo").textContent=fmtDb(d);
+ $("warn").textContent=d>-1?"⚠ CLIPPING RISK":d>-6?"YELLOW — LEVEL HIGH":"GREEN — SAFE";
+ $("warn").style.color=d>-1?"#ff6b6b":d>-6?"#e0bd49":"#7fd08f";
+ if(nodes.autocut && d>-1)nodes.master.gain.value=Math.max(.05,nodes.master.gain.value*.995);
+ if(nodes.autogain && d<-18)nodes.pre.gain.value=Math.min(3,nodes.pre.gain.value*1.001);
+ raf=requestAnimationFrame(meter)
+}
+$("start").addEventListener("click",()=>{if(ctx)meter()},{once:true});
+</script>
+</body>
+</html>
