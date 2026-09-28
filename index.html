@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#101318">
-<title>FEEDER SSME V.1 FINAL</title>
+<title>FEEDER SSME V.2</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#101318;color:#e9edf2;font-family:Arial,sans-serif}
@@ -33,8 +33,8 @@ hr{border:0;border-top:1px solid #2a3038;margin:10px 0}
 </style>
 </head>
 <body>
-<h1>FEEDER – Simple Sound Mixing Engineer V.1</h1>
-<div class="sub">FEEDER SSME V.1 FINAL · lightweight browser audio mixer</div>
+<h1>FEEDER – Simple Sound Mixing Engineer V.2</h1>
+<div class="sub">FEEDER SSME V.2 · lightweight browser audio mixer</div>
 
 <div class="panel">
  <div class="title">INPUT</div>
@@ -326,4 +326,10 @@ async function exportNative(){
 }
 $("exportWav").onclick=()=>exportWav();$("exportMix").onclick=()=>exportWav();$("exportWebm").onclick=exportNative;
 $("exportMp3").onclick=()=>{$("exportStatus").textContent="MP3 memerlukan encoder khusus; versi ringan ini belum menyertakan encoder MP3."};
-$("exportAac").onclick=()=>{$("exportStatus").textContent="AAC/M4A bergantung d
+$("exportAac").onclick=()=>{$("exportStatus").textContent="AAC/M4A bergantung dukungan MediaRecorder browser; Chrome Android biasanya lebih aman memakai WAV/WEBM."};
+$("exportFlac").onclick=()=>{$("exportStatus").textContent="FLAC memerlukan encoder khusus; versi ringan ini belum menyertakan encoder FLAC."};
+$("stemLeft").onclick=()=>exportWav("left","STEM_LEFT");$("stemRight").onclick=()=>exportWav("right","STEM_RIGHT");$("stemCenter").onclick=()=>exportWav("center","STEM_CENTER");$("stemSide").onclick=()=>exportWav("side","STEM_SIDE");
+
+</script>
+</body>
+</html>
