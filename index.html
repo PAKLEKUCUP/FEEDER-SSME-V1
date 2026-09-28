@@ -157,7 +157,7 @@ $("file").onchange=e=>{
  audio=new Audio(URL.createObjectURL(f));audio.preload="auto";connectFile();
  $("filename").textContent=f.name;
 };
-$("start").onclick=async()=>{createAudio();await ctx.resume();if(!audio){$("warn").textContent="Pilih file audio terlebih dahulu.";return}audio.play();};
+$("start").onclick=async()=>{try{createAudio();await ctx.resume();if(!audio){$("warn").textContent="Pilih file audio terlebih dahulu.";return}await audio.play();$("warn").textContent="PLAYING — audio aktif.";}catch(e){$("warn").textContent="GAGAL PLAY: "+(e.name||"Audio error");}};
 $("stop").onclick=()=>{if(audio){audio.pause();audio.currentTime=0}};
 $("play").onclick=async()=>{if(audio){await ctx.resume();audio.play()}};
 $("pause").onclick=()=>{if(audio)audio.pause()};
