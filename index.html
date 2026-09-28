@@ -202,14 +202,27 @@ $("file").onchange=async e=>{
  $("warn").textContent="FILE SIAP — tekan START.";
 };
 async function playAudio(){
- if(!audio){$("warn").textContent="Pilih file audio terlebih dahulu.";return}
+ if(!audio){
+   $("warn").textContent="Pilih file audio terlebih dahulu.";
+   return;
+ }
  try{
-   await unlockAudio();
-  connectFile();
+   createAudio();
+   connectFile();
+
    const promise=audio.play();
-   if(promise) await promise;
+
+   if(ctx.state!=="running"){
+     await ctx.resume();
+   }
+
+   await promise;
+
    $("warn").textContent="PLAYING — audio aktif.";
-   if(!meterStarted){meterStarted=true;meter();}
+   if(!meterStarted){
+     meterStarted=true;
+     meter();
+   }
  }catch(err){
    $("warn").textContent="GAGAL PLAY: "+(err.name||"Audio error");
    console.error(err);
