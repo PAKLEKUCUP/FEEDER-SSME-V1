@@ -105,7 +105,7 @@ hr{border:0;border-top:1px solid #2a3038;margin:10px 0}
 </div>
 
 <script>
-let ctx, src, nodes={}, audio, raf;
+let ctx, src, nodes={}, audio, raf, meterStarted=false;
 const $=id=>document.getElementById(id);
 function db(v){return v<=0.00001?-60:20*Math.log10(v)}
 function fmtDb(v){return v<=-59?"-∞ dB":v.toFixed(1)+" dB"}
